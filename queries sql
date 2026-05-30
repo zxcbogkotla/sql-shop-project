@@ -1,0 +1,74 @@
+-- Create tables
+CREATE TABLE customers (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    email TEXT,
+    city TEXT
+);
+
+CREATE TABLE products (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    price REAL,
+    category TEXT
+);
+
+CREATE TABLE orders (
+    id INTEGER PRIMARY KEY,
+    customer_id INTEGER,
+    product_id INTEGER,
+    quantity INTEGER,
+    order_date TEXT
+);
+
+-- Insert data
+INSERT INTO customers VALUES (1, 'Alice Johnson', 'alice@email.com', 'Prague');
+INSERT INTO customers VALUES (2, 'Bob Smith', 'bob@email.com', 'Berlin');
+INSERT INTO customers VALUES (3, 'Carol White', 'carol@email.com', 'Prague');
+INSERT INTO customers VALUES (4, 'David Brown', 'david@email.com', 'Vienna');
+
+INSERT INTO products VALUES (1, 'Laptop', 999.99, 'Electronics');
+INSERT INTO products VALUES (2, 'Mouse', 29.99, 'Electronics');
+INSERT INTO products VALUES (3, 'Desk', 249.99, 'Furniture');
+INSERT INTO products VALUES (4, 'Chair', 199.99, 'Furniture');
+
+INSERT INTO orders VALUES (1, 1, 1, 1, '2024-01-05');
+INSERT INTO orders VALUES (2, 2, 2, 2, '2024-01-07');
+INSERT INTO orders VALUES (3, 1, 3, 1, '2024-02-01');
+INSERT INTO orders VALUES (4, 3, 4, 1, '2024-02-15');
+INSERT INTO orders VALUES (5, 2, 1, 1, '2024-02-20');
+
+-- Query 1: customers from Prague
+SELECT * FROM customers
+WHERE city = 'Prague';
+
+-- Query 2: total spending per customer
+SELECT c.name, SUM(p.price * o.quantity) as total
+FROM orders o
+JOIN products p ON o.product_id = p.id
+JOIN customers c ON o.customer_id = c.id
+GROUP BY o.customer_id;
+
+-- Query 3: top product by quantity sold
+SELECT p.name, SUM(o.quantity) as total
+FROM orders o
+JOIN products p ON o.product_id = p.id
+GROUP BY p.name
+ORDER BY total DESC
+LIMIT 1;
+
+-- Query 4: total revenue per product category
+SELECT p.category, SUM(p.price * o.quantity) as revenue
+FROM orders o
+JOIN products p ON o.product_id = p.id
+GROUP BY p.category
+ORDER BY revenue DESC;
+
+-- Query 5: customers who spent more than 500
+SELECT c.name, SUM(p.price * o.quantity) as total
+FROM orders o
+JOIN products p ON o.product_id = p.id
+JOIN customers c ON o.customer_id = c.id
+GROUP BY c.id
+HAVING total > 500
+ORDER BY total DESC;
